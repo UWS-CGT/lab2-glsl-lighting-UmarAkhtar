@@ -5,6 +5,7 @@
 
 uniform mat4 modelview;
 uniform mat4 projection;
+
 uniform vec4 lightPosition;
 //uniform mat3 normalmatrix;
 
@@ -28,17 +29,19 @@ void main(void) {
 	ex_V = normalize(-vertexPosition).xyz;
 
 	// surface normal in eye coordinates
-	// taking the rotation part of the modelview matrix to generate the normal matrix
-	// (if scaling is includes, should use transpose inverse modelview matrix!)
-	// this is somewhat wasteful in compute time and should really be part of the cpu program,
-	// giving an additional uniform input
+	
 	mat3 normalmatrix = transpose(inverse(mat3(modelview)));
+	
 	ex_N = normalize(normalmatrix * in_Normal);
+
+	
 
 	// L - to light source from vertex
 	ex_L = normalize(lightPosition.xyz - vertexPosition.xyz);
 
-	ex_TexCoord = in_TexCoord;
+	
+
+	//ex_TexCoord = in_TexCoord;
 
     gl_Position = projection * vertexPosition;
 

@@ -10,13 +10,14 @@
 
 #include "rt3d.h"
 #include "rt3dObjLoader.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #include <stack>
+#include <string>
 #include "md2model.h"
 
-#include <SDL_ttf.h>
+#include "SDL_ttf.h"
 
 using namespace std;
 
@@ -153,7 +154,7 @@ SDL_Window * setupRC(SDL_GLContext &context) {
 
 // A simple texture loading function
 // lots of room for improvement - and better error checking!
-GLuint loadBitmap(char *fname) {
+GLuint loadBitmap( char *fname) {
 	GLuint texID;
 	glGenTextures(1, &texID); // generate texture ID
 
@@ -204,22 +205,22 @@ void init(void) {
 	vector<GLfloat> norms;
 	vector<GLfloat> tex_coords;
 	vector<GLuint> indices;
-	rt3d::loadObj("../../../../Resources/cube.obj", verts, norms, tex_coords, indices);
+	rt3d::loadObj("../Resources/cube.obj", verts, norms, tex_coords, indices);
 	GLuint size = indices.size();
 	meshIndexCount = size;
-	textures[0] = loadBitmap("../../../../Resources/fabric.bmp");
+	textures[0] = loadBitmap("../Resources/fabric.bmp");
 	meshObjects[0] = rt3d::createMesh(verts.size()/3, verts.data(), nullptr, norms.data(), tex_coords.data(), size, indices.data());
 
-	textures[1] = loadBitmap("../../../../Resources/hobgoblin2.bmp");
-	meshObjects[1] = tmpModel.ReadMD2Model("../../../../Resources/tris.MD2");
+	textures[1] = loadBitmap("../Resources/hobgoblin2.bmp");
+	meshObjects[1] = tmpModel.ReadMD2Model("../Resources/tris.MD2");
 	md2VertCount = tmpModel.getVertDataCount();
 
 	
-	
-	skybox[0] = loadBitmap("../../../../Resources/Town-skybox/Town_ft.bmp");
-	skybox[1] = loadBitmap("../../../../Resources/Town-skybox/Town_bk.bmp");
-	skybox[2] = loadBitmap("../../../../Resources/Town-skybox/Town_lf.bmp");
-	skybox[3] = loadBitmap("../../../../Resources/Town-skybox/Town_rt.bmp");
+
+	skybox[0] = loadBitmap("../town-skybox/Town_ft.bmp");
+	skybox[1] = loadBitmap("../town-skybox/Town_bk.bmp");
+	skybox[2] = loadBitmap("../town-skybox/Town_lf.bmp");
+	skybox[3] = loadBitmap("../town-skybox/town_rt.bmp");
 	//skybox[4] = loadBitmap("Town-skybox/Town_up.bmp");
 
 	glEnable(GL_DEPTH_TEST);
@@ -350,6 +351,18 @@ void draw(SDL_Window * window) {
 	// back to remainder of rendering
 	glDepthMask(GL_TRUE); // make sure depth test is on
 
+
+	int uniformIndex =
+		glGetUniformLocation(shaderProgram,"attConst");		
+	glUniform1f(uniformIndex, attConstant);
+
+	uniformIndex =
+		glGetUniformLocation(shaderProgram, "attLinear");
+	glUniform1f(uniformIndex, attLinear);
+
+	uniformIndex =
+		glGetUniformLocation(shaderProgram, "attQuadratic");
+	glUniform1f(uniformIndex, attQuadratic);
 	
 
 
@@ -362,6 +375,19 @@ void draw(SDL_Window * window) {
 	light0.position[1] = tmp.y;
 	light0.position[2] = tmp.z;
 	rt3d::setLightPos(shaderProgram, glm::value_ptr(tmp));
+
+	int uniformIndex = glGetUniformLocation(shaderProgram,
+		"light.ambient");
+	glUniform4fv(uniformIndex, 1, light0.ambient);
+	uniformIndex = glGetUniformLocation(shaderProgram,
+		"light.diffuse");
+	glUniform4fv(uniformIndex, 1, light0.diffuse);
+	uniformIndex = glGetUniformLocation(shaderProgram,
+		"light.specular");
+	glUniform4fv(uniformIndex, 1, light0.specular);
+	uniformIndex = glGetUniformLocation(shaderProgram,
+		"light.position");
+	glUniform4fv(uniformIndex, 1, light0.position);
 
 
 	rt3d::setUniformMatrix4fv(shaderProgram, "projection", glm::value_ptr(projection));

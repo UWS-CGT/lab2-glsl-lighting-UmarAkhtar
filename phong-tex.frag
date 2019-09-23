@@ -30,6 +30,10 @@ in vec2 ex_TexCoord;
 layout(location = 0) out vec4 out_Color;
  
 void main(void) {
+
+//L - to light source from vertex
+
+//vec3 L = normalize(light.position.xyz - vertexPosition.xyz);
     
 	// Ambient intensity
 	vec4 ambientI = light.ambient * material.ambient;
@@ -46,6 +50,6 @@ void main(void) {
 	specularI = specularI * pow(max(dot(R,ex_V),0), material.shininess);
 
 	// Fragment colour
-	out_Color = (ambientI + diffuseI + specularI) * texture(textureUnit0, ex_TexCoord);
-	//out_Color = texture2D(textureUnit0, ex_TexCoord);
+	out_Color = (ambientI + diffuseI + specularI);
+	//out_Color = texture2D(textureUnit0, ex_TexCoord); * texture(textureUnit0, ex_TexCoord
 }
